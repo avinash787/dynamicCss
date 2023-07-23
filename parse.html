@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Custom Elements</title>
+</head>
+<body>
+  <script>
+ 
+ class SimpleHTMLParser {
+ constructor() {
+    this.index = 0;
+    this.tokens = [];
+  }
+ tokenize(input) {
+    this.tokens = input.trim().split(/;\n/);
+  }
+
+  parse(input) {
+    this.tokenize(input);
+    const results = [];
+    for (const token of this.tokens) {
+      this.input = token.trim();
+      if (this.input !== '') {
+        try {
+          const result = this.parseStatement();
+          results.push(result);
+        } catch (error) {
+          console.error(`Parsing error: ${error.message}`);
+          results.push(null);
+        }
+      }
+    }
+    return results;
+  }
+
+  parseStatement() {
+    console.log(this.tokens)
+    this.variable()
+  }
+  
+  variable() {
+    let regex = 
+  }
+
+  tagHierarchy() {
+
+  }
+
+  tag() {
+
+  }
+
+  value() {
+
+  }
+}
+
+const parser = new SimpleHTMLParser();
+const input = `
+  html >> head>title="Hello, World!";
+  html > body>h1 = "abcd"`;
+
+const result = parser.parse(input);
+
+
+//console.log(result);
+
+console.log(input)
+
+
+  </script>
+</body>
+</html>

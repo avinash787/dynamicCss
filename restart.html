@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual DOM Example</title>
+</head>
+<body>
+  <div id="root">
+    <!-- The virtual DOM will be rendered here -->
+  </div>
+
+  <script>
+    // Represents a virtual DOM element
+    class VNode {
+      constructor(tagName, props, children, textNode, key) {
+        this.tagName = tagName;
+        this.props = props || {};
+        this.children = children || [];
+        this.innerNode = textNode || "";
+        this.key = key;
+      }
+    }
+
+    // Helper function to create a new virtual DOM element
+    function createElement(tagName, props, children, textNode, key) {
+      return new VNode(tagName, props, children, textNode, key);
+    }
+
+    // Helper function to convert a virtual DOM element to a real DOM node
+    function createDOMNode(vnode) {
+      if (typeof vnode === 'string') {
+        return document.createTextNode(vnode);
+      }
+
+      const node = document.createElement(vnode.tagName);
+      for (const prop in vnode.props) {
+        if (prop === 'class') {
+          node.className = vnode.props[prop];
+        } else if (prop === 'style') {
+          // Handle inline styles
+          const styleObject = vnode.props[prop];
+          for (const styleProp in styleObject) {
+            node.style[styleProp] = styleObject[styleProp];
+          }
+        } else {
+          // Set other attributes directly
+          node.setAttribute(prop, vnode.props[prop]);
+        }
+      }
+
+      vnode.children.forEach((child) => {
+        const childNode = createDOMNode(child);
+        node.appendChild(childNode);
+      });
+
+      if (vnode.innerNode) {
+        node.appendChild(document.createTextNode(vnode.innerNode));
+      }
+
+      return node;
+    }
+
+    // Sample virtual DOM
+    let oldVNode = createElement('div', { id: 'container', class: 'grid' }, [
+      createElement('h1', { style: { color: 'green' } }, ['Hello, Virtual DOM!']),
+      createElement('div', {}, [createElement('h3', { style: { color: 'yellow' } }, ['Hello']), createElement('button', { style: { color: 'blue' } }, ['Hello'])]),
+      createElement('a', { href: "www.abc.com" }, ['link']),
+    ]);
+
+    // Render the virtual DOM to the real DOM
+    function render(vnode, container) {
+      const rootNode = createDOMNode(vnode);
+      container.appendChild(rootNode);
+    }
+
+    // Initial render
+    const rootElement = document.getElementById('root');
+    render(oldVNode, rootElement);
+  </script>
+</body>
+</html>

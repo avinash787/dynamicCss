@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Custom Elements</title>
+</head>
+<body>
+  <script>
+    // Step 1: Define the CustomElement class that extends HTMLElement
+    class CustomElement extends HTMLElement {
+      constructor() {
+        super();
+
+        // Your custom element's initialization and setup can be done here.
+        // For example, setting up shadow DOM, attaching event listeners, etc.
+      }
+    }
+
+    // Step 2: Define the function to create custom elements with a specific name
+    function createCustomElement(tag) {
+      // Check if the tag is a valid HTML tag
+      //console.log(tag)
+      const isValidTag = document.createElement(tag).toString() !== '[object HTMLUnknownElement]';
+      if (isValidTag) {
+        return document.createElement(tag);
+      } else {
+        // If the tag is not a valid HTML tag, create a custom element with the specified tag name
+        class CustomTagElement extends CustomElement {}
+        customElements.define(tag, CustomTagElement);
+        return new CustomTagElement();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const SimpleHTMLGenerator = {
+        parseInput(statement) {
+          input = statement.replace(/\{(.+?)\}/sg,'')
+          const matchStyles = statement.match(/\{(.+?)\}/s)
+          input.replace(/\{(.+?)\}/sg,'')
+      const regex = /([^>\[]+)(?:>([^=\[]+))?(?:\[(.+?)\])?(?:\{(.+?)\})?(?:=(.+))?\s*=\s*(.*)/s;
+      const match = input.match(regex);
+      ;
+     
+     
+      if (!match) {
+        throw new Error('Invalid input format');
+      }
+
+      const parts = input.replace(/\[.+\]|\{.+\}/g,'').split('=');
+      const tagContent = parts[0].trim();
+      const tag = match[1].trim();
+      const content = match[2] ? match[2].trim() : '';
+      const attributes = match[3] ? match[3].replace(/(\]\[)/,'|').split("|") : '';;
+      const value = match[6] ? match[6].trim() : '';
+      const style = matchStyles ? matchStyles[1]: '';
+
+      const attributeValue = {};
+      if (attributes) {
+        for (const pair of attributes) {
+          const [key, val] = pair.split('=');
+          if (key && val) {
+            attributeValue[key.trim()] = val.trim().replace(/\\=/g, '=').replace(/\"/g,'');
+          }
+        }
+      }
+
+      //console.log({ tag, content, attributes: attributeValue, value, tagContent, style })
+
+      return { tag, content, attributes: attributeValue, value, tagContent, style };
+    },
+
+        generateAndAppendElement(parsedInput, parent) {
+  const { tagContent, value, attributes, style } = parsedInput;
+  const parts = tagContent.split('>');
+  const tag = parts.pop().trim();
+
+  const element = createCustomElement(tag);
+
+  // Set text content or 'value' attribute if provided
+  if (value) {
+    element.textContent = value;
+  }
+
+  // Apply attributes
+  if (attributes && Object.keys(attributes).length > 0) {
+    for (const [key, val] of Object.entries(attributes)) {
+      element.setAttribute(key, val);
+    }
+  }
+
+  // Apply styles
+   if (style) {
+    const stylePairs = style.split(';');
+    for (const stylePair of stylePairs) {
+      const [property, propertyValue] = stylePair.split(':');
+      if (property && propertyValue) {
+        element.style[property.trim()] = propertyValue.trim();
+      }
+    }
+  }
+
+  if (parts.length > 0) {
+    const parentTag = parts.join('>');
+    const existingParent = this.findExistingParent(parent, parentTag);
+    if (existingParent) {
+      existingParent.appendChild(element);
+    } else {
+      const parentElement = this.generateAndAppendElement(
+        { tagContent: parentTag },
+        parent
+      );
+      parentElement.appendChild(element);
+    }
+  } else {
+    parent.appendChild(element);
+  }
+  return element;
+}
+,
+
+        findExistingParent(parent, tag) {
+          const children = parent.children;
+          for (let i = 0; i < children.length; i++) {
+            if (children[i].tagName.toLowerCase() === tag.toLowerCase()) {
+              return children[i];
+            }
+          }
+          return null;
+        },
+
+        parseAndGenerate(input, targetElement) {
+          const parsedInput = this.parseInput(input);
+          const target = document.querySelector(targetElement);
+          this.generateAndAppendElement(parsedInput, target);
+        },
+      };
+
+      SimpleHTMLGenerator.parseAndGenerate('head>title=Hello, World!', 'html');
+            SimpleHTMLGenerator.parseAndGenerate('div>h1=Hello, this is a heading! ajfha flskhafkl s', 'html>body');
+            SimpleHTMLGenerator.parseAndGenerate(`body>h1[class="heading"]{
+              color: blue;
+              font-size: 24px;
+            } = one line heading with style`, 'html');
+    });
+  </script>
+</body>
+</html>
