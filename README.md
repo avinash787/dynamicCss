@@ -42,8 +42,6 @@ Will generate below
 ```html
 <html>
 <head>
-    <link rel="stylesheet" href="/styles.dcss">
-    <script src="/dynamicscript.js"></script>
     <title>My website</title>
 </head>
 <body>
