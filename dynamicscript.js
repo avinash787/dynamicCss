@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Custom Elements</title>
-</head>
-<body>
-  <script>
+
     // Step 1: Define the CustomElement class that extends HTMLElement
     class CustomElement extends HTMLElement {
       constructor() {
@@ -32,7 +26,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       const SimpleHTMLGenerator = {
-        parseInput(statement) {
+        parseInput(statement, targetElement) {
           input = statement.replace(/\{(.+?)\}/sg,'')
           const matchStyles = statement.match(/\{(.+?)\}/s)
           input.replace(/\{(.+?)\}/sg,'')
@@ -70,6 +64,12 @@
 
         generateAndAppendElement(parsedInput, parent) {
   const { tagContent, value, attributes, style } = parsedInput;
+  console.log(tagContent,value)
+  if(tagContent == 'body'){
+    const textNode = document.createTextNode(value);
+    document.body.appendChild(textNode);
+    return
+  }
   const parts = tagContent.split('>');
   const tag = parts.pop().trim();
 
@@ -118,6 +118,7 @@
 ,
 
         findExistingParent(parent, tag) {
+
           const children = parent.children;
           for (let i = 0; i < children.length; i++) {
             if (children[i].tagName.toLowerCase() === tag.toLowerCase()) {
@@ -128,19 +129,45 @@
         },
 
         parseAndGenerate(input, targetElement) {
-          const parsedInput = this.parseInput(input);
+          const parsedInput = this.parseInput(input,targetElement);
           const target = document.querySelector(targetElement);
           this.generateAndAppendElement(parsedInput, target);
         },
       };
 
-      SimpleHTMLGenerator.parseAndGenerate('head>title=Hello, World!', 'html');
-            SimpleHTMLGenerator.parseAndGenerate('div>h1=Hello, this is a heading! ajfha flskhafkl s', 'html>body');
-            SimpleHTMLGenerator.parseAndGenerate(`body>h1[class="heading"]{
-              color: blue;
-              font-size: 24px;
-            } = one line heading with style`, 'html');
+
+let style = fetch('styles.dcss')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to fetch DCSS file');
+    }
+    return response.text();
+  })
+  .then(cssText => {
+    let val = cssText
+    let matchRoot = /:root\s*{([^}]*)}/gmi
+let matchRules = val.match(/(.*({([^}]*)})?\s*=\s*([^\n]*\S))/g)
+
+for (let x = 0 ; x < matchRules.length; x++){
+let parent = matchRules[x].match(/(.*)>{2}/)
+let target = parent == null ? "html" : parent[1]
+let input = matchRules[x].replace(/(.*)>{2}/,'')
+  SimpleHTMLGenerator.parseAndGenerate( input, target);
+  
+}
+
+  })
+  .catch(error => {
+    console.error('Error fetching DCSS file:', error);
+});
+ 
+
+
+
+
+
+
+
+ 
     });
-  </script>
-</body>
-</html>
+
