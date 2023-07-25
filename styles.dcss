@@ -1,2 +1,5 @@
-body>div>div = kkkkk
-body>div>>h1 = hehehe
+head>title = My website
+body>h1 = My heading 
+body>p = This is a paragraph 
+body>div>div = my content
+body>div>>div = My paragraphs
