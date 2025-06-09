@@ -17,7 +17,7 @@
         return document.createElement(tag);
       } else {
         // If the tag is not a valid HTML tag, create a custom element with the specified tag name
-        class CustomTagElement extends CustomElement {}
+        class CustomTagElement extends CustomElement {}//hey sahu
         customElements.define(tag, CustomTagElement);
         return new CustomTagElement();
       }
