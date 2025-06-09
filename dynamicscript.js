@@ -8,6 +8,8 @@
         // For example, setting up shadow DOM, attaching event listeners, etc.
       }
     }
+
+    
 // added comment
     // Step 2: Define the function to create custom elements with a specific name
     function createCustomElement(tag) {
