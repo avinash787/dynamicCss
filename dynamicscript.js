@@ -8,9 +8,6 @@
         // For example, setting up shadow DOM, attaching event listeners, etc.
       }
     }
-//hello
-
-
     // Step 2: Define the function to create custom elements with a specific name
     function createCustomElement(tag) {
       // Check if the tag is a valid HTML tag
