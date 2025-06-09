@@ -9,8 +9,6 @@
       }
     }
 
-    
-// added comment
     // Step 2: Define the function to create custom elements with a specific name
     function createCustomElement(tag) {
       // Check if the tag is a valid HTML tag
@@ -25,7 +23,7 @@
         return new CustomTagElement();
       }
     }
-
+//h2
     document.addEventListener('DOMContentLoaded', function() {
       const SimpleHTMLGenerator = {
         parseInput(statement, targetElement) {
